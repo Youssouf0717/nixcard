@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Animations — Nixcard Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+body {
+  font-family: Inter,-apple-system,sans-serif;
+  background: #0f172a;
+  color: #e5e7eb;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Topbar ── */
+.topbar {
+  display: flex; align-items: center; gap: 14px;
+  padding: 15px 28px;
+  border-bottom: 1px solid #1f2937;
+  position: sticky; top:0; z-index:50;
+  background: rgba(15,23,42,.92);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.topbar-back {
+  display: flex; align-items: center; gap: 6px;
+  color: #ff8a33; font-size: 13px; font-weight: 600;
+  text-decoration: none;
+  transition: color .15s;
+}
+.topbar-back:hover { color: #ff6a00; text-decoration: none; }
+
+.topbar-sep { width: 1px; height: 18px; background: #1f2937; flex-shrink:0; }
+
+.topbar-title {
+  font-size: 14px; font-weight: 700; color: #e5e7eb;
+}
+
+.topbar-meta {
+  margin-left: auto;
+  display: flex; align-items: center; gap: 8px;
+}
+
+.meta-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #ff6a00;
+  box-shadow: 0 0 6px #ff6a00;
+  animation: meta-pulse 2s ease-in-out infinite;
+}
+
+@keyframes meta-pulse {
+  0%,100% { opacity:.5; }
+  50%      { opacity:1; }
+}
+
+.meta-label {
+  font-size: 11px; font-weight: 700; letter-spacing: .8px;
+  text-transform: uppercase; color: #374151;
+}
+
+/* ── Page ── */
+.page { max-width: 960px; margin: 0 auto; padding: 48px 24px 80px; }
+
+/* ── Header ── */
+.page-head {
+  margin-bottom: 48px;
+  animation: fade-up .4s ease both;
+}
+
+.page-head h1 {
+  font-size: 2.2rem; font-weight: 800; letter-spacing: -.5px;
+  color: #e5e7eb; line-height: 1.15; margin-bottom: 10px;
+}
+
+.page-head h1 em {
+  font-style: normal;
+  background: linear-gradient(90deg, #ff6a00, #ff8a33);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.page-head p {
+  color: #4b5563; font-size: .9rem;
+}
+
+.page-head p strong { color: #6b7280; font-weight: 600; }
+
+/* ── Grid ── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 14px;
+}
+
+/* ── Demo card ── */
+.demo-card {
+  background: #111827;
+  border: 1px solid #1f2937;
+  border-radius: 20px;
+  padding: 28px 22px 22px;
+  display: flex; flex-direction: column;
+  animation: fade-up .4s ease both;
+  transition: border-color .2s;
+}
+.demo-card:hover { border-color: #374151; }
+.demo-card:nth-child(2) { animation-delay: .08s; }
+.demo-card:nth-child(3) { animation-delay: .16s; }
+.demo-card:nth-child(4) { animation-delay: .24s; }
+
+@keyframes fade-up {
+  from { opacity:0; transform:translateY(18px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+.demo-tag {
+  font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase; color: #374151;
+  margin-bottom: 28px;
+  display: flex; align-items: center; gap: 8px;
+}
+
+.demo-tag::after {
+  content: '';
+  flex: 1; height: 1px;
+  background: #1f2937;
+}
+
+.demo-stage {
+  flex: 1;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 18px; min-height: 170px;
+}
+
+.demo-footer { margin-top: 22px; padding-top: 18px; border-top: 1px solid #1f2937; }
+
+.demo-name {
+  font-size: .92rem; font-weight: 700; color: #e5e7eb;
+  margin-bottom: 5px;
+}
+
+.demo-desc {
+  font-size: .78rem; color: #4b5563; line-height: 1.6;
+}
+
+/* ── Replay button ── */
+.replay-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 6px 13px; border-radius: 8px;
+  background: rgba(255,106,0,.08); border: 1px solid rgba(255,106,0,.2);
+  color: #ff8a33; font-size: 11px; font-weight: 600;
+  cursor: pointer; font-family: inherit;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.replay-btn:hover { background: rgba(255,106,0,.15); border-color: #ff6a00; color: #ff6a00; }
+
+/* ── Demo buttons ── */
+.btn-row { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+
+.demo-btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 11px 20px; border-radius: 11px;
+  font-family: inherit; font-weight: 700; font-size: .88rem;
+  cursor: pointer; border: none; width: 100%;
+  transition: transform .15s, box-shadow .2s;
+  text-decoration: none;
+}
+
+.demo-btn-primary {
+  background: linear-gradient(135deg, #ff6a00, #ff8a33);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(255,106,0,.28);
+}
+.demo-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px rgba(255,106,0,.45);
+}
+.demo-btn-primary:active { transform: translateY(0); }
+
+.demo-btn-ghost {
+  background: #1f2937; color: #9ca3af;
+  border: 1px solid #374151 !important;
+}
+.demo-btn-ghost:hover {
+  transform: translateY(-1px);
+  color: #e5e7eb;
+  border-color: #4b5563 !important;
+}
+
+.btn-hint {
+  font-size: 10px; color: #374151; font-weight: 600;
+  letter-spacing: .5px; text-transform: uppercase;
+  text-align: center;
+}
+
+/* ── Hint pill ── */
+.hint-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: #1f2937; border: 1px solid #374151;
+  border-radius: 99px; padding: 4px 10px;
+  font-size: 10px; color: #4b5563; font-weight: 600;
+}
+
+/* ── Color palette snippet ── */
+.palette {
+  display: flex; gap: 6px; margin-top: 32px;
+  animation: fade-up .4s .3s ease both;
+}
+
+.swatch {
+  flex: 1; height: 32px; border-radius: 8px;
+  position: relative;
+}
+.swatch::after {
+  content: attr(data-label);
+  position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%);
+  font-size: 9px; font-weight: 600; color: #374151;
+  white-space: nowrap;
+}
+</style>
+</head>
+<body>
+
+<!-- ── Topbar ─────────────────────────────────────────────── -->
+<div class="topbar">
+  <a class="topbar-back" href="/">
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+      <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+    </svg>
+    Retour
+  </a>
+  <div class="topbar-sep"></div>
+  <span class="topbar-title">Design System</span>
+  <div class="topbar-meta">
+    <div class="meta-dot"></div>
+    <span class="meta-label">Nixcard · v1.0</span>
+  </div>
+</div>
+
+<!-- ── Page ──────────────────────────────────────────────── -->
+<div class="page">
+
+  <div class="page-head">
+    <h1>Animations <em>Nixcard</em></h1>
+    <p>
+      <strong>Dark</strong> · <strong>#ff6a00</strong> · Smooth SaaS · Minimal &amp; clean
+    </p>
+  </div>
+
+  <div class="grid">
+
+    <!-- ── 1. QR Scan ───────────────────────────────────── -->
+    <div class="demo-card">
+      <span class="demo-tag">01 — QR Scan</span>
+
+      <div class="demo-stage">
+        <!-- Fake QR code (SVG with finder patterns) -->
+        <div class="nx-qr-wrap">
+          <svg viewBox="0 0 21 21" width="130" height="130"
+               xmlns="http://www.w3.org/2000/svg" style="display:block">
+            <rect width="21" height="21" fill="white"/>
+            <!-- TL finder -->
+            <rect x="0"  y="0"  width="7" height="7" fill="#111"/>
+            <rect x="1"  y="1"  width="5" height="5" fill="white"/>
+            <rect x="2"  y="2"  width="3" height="3" fill="#111"/>
+            <!-- TR finder -->
+            <rect x="14" y="0"  width="7" height="7" fill="#111"/>
+            <rect x="15" y="1"  width="5" height="5" fill="white"/>
+            <rect x="16" y="2"  width="3" height="3" fill="#111"/>
+            <!-- BL finder -->
+            <rect x="0"  y="14" width="7" height="7" fill="#111"/>
+            <rect x="1"  y="15" width="5" height="5" fill="white"/>
+            <rect x="2"  y="16" width="3" height="3" fill="#111"/>
+            <!-- Timing row/col -->
+            <rect x="8"  y="6"  width="1" height="1" fill="#111"/>
+            <rect x="10" y="6"  width="1" height="1" fill="#111"/>
+            <rect x="12" y="6"  width="1" height="1" fill="#111"/>
+            <rect x="6"  y="8"  width="1" height="1" fill="#111"/>
+            <rect x="6"  y="10" width="1" height="1" fill="#111"/>
+            <rect x="6"  y="12" width="1" height="1" fill="#111"/>
+            <!-- Data modules -->
+            <rect x="8"  y="8"  width="1" height="1" fill="#111"/>
+            <rect x="9"  y="9"  width="2" height="2" fill="#111"/>
+            <rect x="12" y="8"  width="2" height="1" fill="#111"/>
+            <rect x="11" y="10" width="1" height="1" fill="#111"/>
+            <rect x="14" y="9"  width="1" height="1" fill="#111"/>
+            <rect x="8"  y="11" width="1" height="2" fill="#111"/>
+            <rect x="10" y="11" width="3" height="1" fill="#111"/>
+            <rect x="14" y="10" width="2" height="2" fill="#111"/>
+            <rect x="8"  y="13" width="3" height="1" fill="#111"/>
+            <rect x="13" y="13" width="1" height="1" fill="#111"/>
+            <rect x="9"  y="14" width="1" height="2" fill="#111"/>
+            <rect x="11" y="14" width="2" height="1" fill="#111"/>
+            <rect x="14" y="14" width="2" height="2" fill="#111"/>
+            <rect x="10" y="16" width="1" height="1" fill="#111"/>
+            <rect x="12" y="16" width="3" height="1" fill="#111"/>
+            <rect x="8"  y="18" width="2" height="1" fill="#111"/>
+            <rect x="11" y="18" width="1" height="2" fill="#111"/>
+            <rect x="14" y="18" width="3" height="1" fill="#111"/>
+            <rect x="9"  y="19" width="1" height="1" fill="#111"/>
+          </svg>
+          <div class="nx-qr-line"></div>
+          <div class="nx-qr-corner nx-qr-corner-tl"></div>
+          <div class="nx-qr-corner nx-qr-corner-tr"></div>
+          <div class="nx-qr-corner nx-qr-corner-bl"></div>
+          <div class="nx-qr-corner nx-qr-corner-br"></div>
+        </div>
+      </div>
+
+      <div class="demo-footer">
+        <p class="demo-name">QR Scan</p>
+        <p class="demo-desc">
+          Ligne de balayage orange avec halo lumineux. Coins en biais. Active en continu sur les cartes publiques.
+        </p>
+      </div>
+    </div>
+
+    <!-- ── 2. Loading ────────────────────────────────────── -->
+    <div class="demo-card">
+      <span class="demo-tag">02 — Loading</span>
+
+      <div class="demo-stage">
+        <!-- Ring spinner -->
+        <div class="nx-loader">
+          <div class="nx-ring nx-ring-outer"></div>
+          <div class="nx-ring nx-ring-inner"></div>
+          <div class="nx-ring-dot"></div>
+        </div>
+
+        <!-- Progress bar -->
+        <span class="nx-bar"></span>
+
+        <!-- Dots -->
+        <div class="nx-dots">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+
+      <div class="demo-footer">
+        <p class="demo-name">Loading States</p>
+        <p class="demo-desc">
+          Spinner double anneau, barre de progression et points sautants. Adapté selon le contexte.
+        </p>
+      </div>
+    </div>
+
+    <!-- ── 3. Success ─────────────────────────────────────── -->
+    <div class="demo-card">
+      <span class="demo-tag">03 — Success</span>
+
+      <div class="demo-stage">
+        <div class="nx-success animate" id="success-anim">
+          <svg class="nx-success-svg" viewBox="0 0 56 56" width="84" height="84"
+               xmlns="http://www.w3.org/2000/svg">
+            <!-- Track ring -->
+            <circle class="nx-circle-track" cx="28" cy="28" r="24"/>
+            <!-- Animated fill ring -->
+            <circle class="nx-circle-fill"  cx="28" cy="28" r="24"/>
+            <!-- Animated checkmark -->
+            <path   class="nx-check"        d="M 17 28 L 25 36 L 40 19"/>
+          </svg>
+        </div>
+
+        <button class="replay-btn" id="replay-btn">
+          <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor">
+            <path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/>
+          </svg>
+          Rejouer
+        </button>
+      </div>
+
+      <div class="demo-footer">
+        <p class="demo-name">Success</p>
+        <p class="demo-desc">
+          Cercle tracé, puis coche dessinée en séquence. Éclat radial orange pour la confirmation.
+        </p>
+      </div>
+    </div>
+
+    <!-- ── 4. Button Hover ────────────────────────────────── -->
+    <div class="demo-card">
+      <span class="demo-tag">04 — Bouton</span>
+
+      <div class="demo-stage" style="width:100%">
+        <div class="btn-row">
+          <button class="demo-btn demo-btn-primary nx-shimmer">
+            Créer une carte
+          </button>
+          <button class="demo-btn demo-btn-ghost nx-shimmer">
+            Annuler
+          </button>
+        </div>
+        <p class="btn-hint">↑ Passez la souris</p>
+      </div>
+
+      <div class="demo-footer">
+        <p class="demo-name">Button Hover</p>
+        <p class="demo-desc">
+          Reflet lumineux en diagonale au survol. Élévation légère. Glow orange intensifié.
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Palette -->
+  <div class="palette">
+    <div class="swatch" style="background:#0f172a;border:1px solid #1f2937" data-label="bg"></div>
+    <div class="swatch" style="background:#111827;border:1px solid #1f2937" data-label="card"></div>
+    <div class="swatch" style="background:#1f2937" data-label="border"></div>
+    <div class="swatch" style="background:#4b5563" data-label="muted"></div>
+    <div class="swatch" style="background:#e5e7eb" data-label="text"></div>
+    <div class="swatch" style="background:#ff6a00" data-label="primary"></div>
+    <div class="swatch" style="background:linear-gradient(135deg,#ff6a00,#ff8a33)" data-label="gradient"></div>
+  </div>
+
+</div>
+
+<script>
+// ── Success animation auto-replay ──────────────────────────────────
+function replaySuccess() {
+  const el = document.getElementById('success-anim');
+  el.classList.remove('animate');
+  void el.offsetWidth; // force reflow to restart CSS animation
+  el.classList.add('animate');
+}
+
+document.getElementById('replay-btn').addEventListener('click', replaySuccess);
+
+// Auto-replay every 3.5 seconds
+setInterval(replaySuccess, 3500);
+</script>
+</body>
+</html>

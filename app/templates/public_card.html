@@ -1,0 +1,913 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ card.full_name }} — Nixcard</title>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+*,*::before,*::after{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+body{
+  font-family:Inter,-apple-system,sans-serif;
+
+  background:
+    radial-gradient(circle at top right,
+      rgba(255,106,0,.12),
+      transparent 28%),
+
+    radial-gradient(circle at bottom left,
+      rgba(255,106,0,.08),
+      transparent 32%),
+
+    #0f172a;
+
+  min-height:100vh;
+
+  -webkit-font-smoothing:antialiased;
+
+  overflow-x:hidden;
+
+  padding-bottom:40px;
+}
+
+/* ───────────────────────────── */
+
+.vc-cover{
+  width:100%;
+  height:210px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #1a0a00 0%,
+      #7c2d00 50%,
+      #ff6a00 100%
+    );
+
+  position:relative;
+  overflow:hidden;
+}
+
+.vc-cover::before{
+  content:'';
+
+  position:absolute;
+  inset:0;
+
+  background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+.vc-cover-logo{
+  position:absolute;
+
+  top:16px;
+  left:50%;
+
+  transform:translateX(-50%);
+
+  display:flex;
+  align-items:center;
+  gap:8px;
+
+  color:rgba(255,255,255,.72);
+
+  font-size:13px;
+  font-weight:800;
+
+  letter-spacing:3px;
+  text-transform:uppercase;
+}
+
+.vc-cover-logo img{
+  width:22px;
+  height:22px;
+
+  border-radius:6px;
+
+  opacity:.9;
+}
+
+.vc-chip{
+  position:absolute;
+
+  right:18px;
+  bottom:18px;
+
+  padding:8px 14px;
+
+  border-radius:999px;
+
+  background:rgba(255,255,255,.12);
+
+  border:1px solid rgba(255,255,255,.16);
+
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+
+  color:#fff;
+
+  font-size:.7rem;
+  font-weight:700;
+  letter-spacing:.8px;
+}
+
+/* ───────────────────────────── */
+
+.vc-wrapper{
+  max-width:460px;
+  margin:0 auto;
+  position:relative;
+}
+
+@supports not ((backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px))){
+  .vc-card{
+    background:#111827;
+  }
+}
+
+.vc-card{
+  position:relative;
+  overflow:hidden;
+
+  border-radius:24px;
+
+  margin:-64px 16px 32px;
+
+  padding:0 0 28px;
+
+  border:1px solid #1f2937;
+
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(17,24,39,.92),
+      rgba(17,24,39,.98)
+    );
+
+  box-shadow:
+    0 20px 60px rgba(0,0,0,.6);
+
+  transition:
+    transform .25s ease,
+    box-shadow .25s ease,
+    border-color .25s ease;
+
+  animation:
+    slideUp .5s cubic-bezier(.22,1,.36,1) both,
+    float 7s ease-in-out infinite;
+}
+
+.vc-card:hover{
+  translate:0 -4px;
+
+  border-color:rgba(255,106,0,.35);
+
+  box-shadow:
+    0 30px 80px rgba(0,0,0,.65),
+    0 0 40px rgba(255,106,0,.08);
+}
+
+.vc-card::before{
+  content:'';
+
+  position:absolute;
+  inset:0;
+
+  background:
+    radial-gradient(circle at top right,
+      rgba(255,106,0,.12),
+      transparent 35%);
+
+  pointer-events:none;
+}
+
+/* ───────────────────────────── */
+
+.vc-avatar-wrap{
+  display:flex;
+  justify-content:center;
+
+  position:relative;
+
+  height:80px;
+
+  margin-top:16px;
+}
+
+.vc-avatar,
+.vc-initials{
+  width:112px;
+  height:112px;
+
+  border-radius:50%;
+
+  position:absolute;
+  top:-56px;
+
+  border:4px solid #111827;
+
+  box-shadow:
+    0 0 0 3px #ff6a00,
+    0 8px 24px rgba(0,0,0,.5);
+
+  animation:
+    popIn .5s .15s cubic-bezier(.34,1.56,.64,1) both;
+}
+
+.vc-avatar{
+  object-fit:cover;
+}
+
+.vc-initials{
+  background:
+    linear-gradient(
+      135deg,
+      #7c2d00,
+      #ff6a00
+    );
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:2.2rem;
+  font-weight:800;
+
+  color:#fff;
+}
+
+/* ───────────────────────────── */
+
+.vc-identity{
+  text-align:center;
+
+  padding:20px 24px 0;
+
+  animation:fadeInUp .4s .25s ease both;
+}
+
+.vc-name{
+  font-size:1.6rem;
+  font-weight:800;
+
+  color:#e5e7eb;
+
+  letter-spacing:-.4px;
+}
+
+.vc-title{
+  margin-top:4px;
+
+  color:#ff8a33;
+
+  font-size:.95rem;
+  font-weight:600;
+}
+
+.vc-company{
+  margin-top:2px;
+
+  color:#9ca3af;
+
+  font-size:.88rem;
+}
+
+/* ───────────────────────────── */
+
+.vc-divider{
+  height:1px;
+
+  background:#1f2937;
+
+  margin:20px 24px 0;
+}
+
+/* ───────────────────────────── */
+
+.vc-actions{
+  display:flex;
+  justify-content:center;
+
+  gap:12px;
+
+  padding:20px 24px 0;
+
+  animation:fadeInUp .4s .35s ease both;
+}
+
+.vc-action{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+
+  gap:6px;
+
+  flex:1;
+  max-width:90px;
+
+  text-decoration:none;
+
+  transition:transform .18s ease;
+}
+
+.vc-action:hover{
+  transform:translateY(-2px);
+}
+
+.vc-action-icon{
+  width:52px;
+  height:52px;
+
+  border-radius:16px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:#1f2937;
+
+  border:1px solid #374151;
+
+  font-size:22px;
+
+  transition:
+    transform .18s,
+    box-shadow .18s;
+}
+
+.vc-action:hover .vc-action-icon{
+  transform:translateY(-3px) scale(1.05);
+
+  border-color:#ff6a00;
+
+  box-shadow:
+    0 6px 18px rgba(255,106,0,.25);
+}
+
+.vc-action span{
+  font-size:.72rem;
+  font-weight:600;
+
+  color:#9ca3af;
+
+  text-align:center;
+}
+
+/* ───────────────────────────── */
+
+.vc-section-title{
+  padding:20px 24px 10px;
+
+  color:#4b5563;
+
+  font-size:.72rem;
+  font-weight:700;
+
+  letter-spacing:.8px;
+  text-transform:uppercase;
+
+  animation:fadeInUp .4s .45s ease both;
+}
+
+/* ───────────────────────────── */
+
+.vc-socials{
+  display:flex;
+  flex-wrap:wrap;
+
+  gap:8px;
+
+  padding:0 24px;
+
+  animation:fadeInUp .4s .5s ease both;
+}
+
+.vc-social{
+  display:flex;
+  align-items:center;
+  gap:8px;
+
+  padding:9px 14px;
+
+  border-radius:12px;
+
+  background:#1f2937;
+
+  border:1px solid #374151;
+
+  color:#e5e7eb;
+
+  text-decoration:none;
+
+  font-size:.82rem;
+  font-weight:600;
+
+  transition:
+    transform .15s ease,
+    background .15s ease,
+    border-color .15s ease;
+}
+
+.vc-social:hover{
+  transform:translateY(-2px);
+
+  background:#374151;
+
+  border-color:#ff6a00;
+
+  color:#fff;
+}
+
+.vc-social svg{
+  width:16px;
+  height:16px;
+
+  flex-shrink:0;
+}
+
+/* ───────────────────────────── */
+
+.vc-qr-wrap{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+
+  gap:8px;
+
+  padding:20px 24px 0;
+
+  animation:fadeInUp .4s .55s ease both;
+}
+
+.vc-qr-frame{
+  background:#fff;
+
+  border:2px solid #1f2937;
+
+  border-radius:16px;
+
+  padding:10px;
+
+  box-shadow:
+    0 0 0 1px rgba(255,106,0,.2);
+
+  transition:
+    transform .2s ease,
+    box-shadow .2s ease;
+}
+
+.vc-qr-frame:hover{
+  transform:translateY(-2px);
+
+  box-shadow:
+    0 10px 25px rgba(255,106,0,.18);
+}
+
+.vc-qr-frame img{
+  width:120px;
+  height:120px;
+
+  display:block;
+
+  border-radius:8px;
+}
+
+.vc-qr-label{
+  color:#4b5563;
+
+  font-size:.75rem;
+
+  text-align:center;
+}
+
+/* ───────────────────────────── */
+
+.vc-save{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+
+  margin:20px 24px 0;
+
+  padding:14px;
+
+  border-radius:14px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #ff6a00,
+      #ff8a33
+    );
+
+  color:#fff;
+
+  text-decoration:none;
+
+  font-size:1rem;
+  font-weight:700;
+
+  letter-spacing:.2px;
+
+  position:relative;
+  overflow:hidden;
+
+  isolation:isolate;
+
+  transition:
+    transform .18s ease,
+    box-shadow .18s ease;
+
+  animation:
+    fadeInUp .4s .6s ease both;
+
+  box-shadow:
+    0 4px 20px rgba(255,106,0,.35);
+}
+
+.vc-save::before{
+  content:'';
+
+  position:absolute;
+
+  top:0;
+  left:-120%;
+
+  width:80%;
+  height:100%;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(255,255,255,.22),
+      transparent
+    );
+
+  transform:skewX(-20deg);
+}
+
+.vc-save:hover::before{
+  transition:1s;
+  left:130%;
+}
+
+.vc-save:hover{
+  transform:translateY(-2px);
+
+  box-shadow:
+    0 8px 28px rgba(255,106,0,.5);
+}
+
+.vc-save svg{
+  width:18px;
+  height:18px;
+
+  fill:none;
+  stroke:#fff;
+  stroke-width:2;
+
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+
+/* ───────────────────────────── */
+
+.vc-footer{
+  text-align:center;
+
+  padding:16px 0 24px;
+
+  color:#374151;
+
+  font-size:.75rem;
+
+  animation:fadeIn .5s .7s ease both;
+}
+
+.vc-footer a{
+  color:#ff8a33;
+  font-weight:700;
+}
+
+/* ───────────────────────────── */
+
+@keyframes slideUp{
+  from{
+    opacity:0;
+    transform:translateY(32px);
+  }
+
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+@keyframes popIn{
+  from{
+    opacity:0;
+    transform:scale(.7);
+  }
+
+  to{
+    opacity:1;
+    transform:scale(1);
+  }
+}
+
+@keyframes fadeInUp{
+  from{
+    opacity:0;
+    transform:translateY(12px);
+  }
+
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+@keyframes fadeIn{
+  from{
+    opacity:0;
+  }
+
+  to{
+    opacity:1;
+  }
+}
+
+@keyframes float{
+  0%{
+    transform:translateY(0);
+  }
+
+  50%{
+    transform:translateY(-8px);
+  }
+
+  100%{
+    transform:translateY(0);
+  }
+}
+
+/* ───────────────────────────── */
+
+@media(min-width:520px){
+
+  body{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+
+    padding:32px 16px 40px;
+  }
+
+  .vc-cover{
+    max-width:460px;
+
+    height:180px;
+
+    border-radius:24px 24px 0 0;
+  }
+
+  .vc-wrapper{
+    width:100%;
+  }
+
+  .vc-card{
+    margin:-64px 0 0;
+  }
+}
+</style>
+</head>
+
+<body>
+
+{% set socials = card.socials or {} %}
+
+<div class="vc-cover">
+
+  <div class="vc-cover-logo">
+    <img src="{{ url_for('static', filename='nixcard.png') }}" alt="Nixcard">
+    NIXCARD
+  </div>
+
+  <div class="vc-chip">
+    SMART PROFILE
+  </div>
+
+</div>
+
+<div class="vc-wrapper">
+
+<div class="vc-card">
+
+  <div class="vc-avatar-wrap">
+
+    {% if card.photo_url %}
+      <img
+        class="vc-avatar"
+        src="{{ url_for('static', filename=card.photo_url) }}"
+        alt="{{ card.full_name }}">
+    {% else %}
+      <div class="vc-initials">
+        {{ card.first_name[0] }}{{ card.last_name[0] }}
+      </div>
+    {% endif %}
+
+  </div>
+
+  <div class="vc-identity">
+
+    <h1 class="vc-name">
+      {{ card.full_name }}
+    </h1>
+
+    {% if card.job_title %}
+      <p class="vc-title">
+        {{ card.job_title }}
+      </p>
+    {% endif %}
+
+    {% if card.company %}
+      <p class="vc-company">
+        {{ card.company }}
+      </p>
+    {% endif %}
+
+  </div>
+
+  {% if card.phone or card.email %}
+
+  <div class="vc-divider"></div>
+
+  <div class="vc-actions">
+
+    {% if card.phone %}
+    <a class="vc-action" href="tel:{{ card.phone }}">
+      <div class="vc-action-icon">📞</div>
+      <span>Appeler</span>
+    </a>
+    {% endif %}
+
+    {% if card.email %}
+    <a class="vc-action" href="mailto:{{ card.email }}">
+      <div class="vc-action-icon">✉️</div>
+      <span>Email</span>
+    </a>
+    {% endif %}
+
+    {% if card.phone %}
+    <a
+      class="vc-action"
+      href="https://wa.me/{{ card.phone|replace(' ','')|replace('+','') }}"
+      target="_blank"
+      rel="noopener noreferrer">
+
+      <div class="vc-action-icon">💬</div>
+      <span>WhatsApp</span>
+
+    </a>
+    {% endif %}
+
+  </div>
+
+  {% endif %}
+
+  {% set has_socials = namespace(found=false) %}
+  {% for k,v in socials.items() %}
+    {% if v %}
+      {% set has_socials.found=true %}
+    {% endif %}
+  {% endfor %}
+
+  {% if has_socials.found %}
+
+  <p class="vc-section-title">
+    Réseaux sociaux
+  </p>
+
+  <div class="vc-socials">
+
+    {% if socials.linkedin %}
+    <a class="vc-social"
+       href="{{ socials.linkedin }}"
+       target="_blank"
+       rel="noopener noreferrer">
+      LinkedIn
+    </a>
+    {% endif %}
+
+    {% if socials.instagram %}
+    <a class="vc-social"
+       href="{{ socials.instagram }}"
+       target="_blank"
+       rel="noopener noreferrer">
+      Instagram
+    </a>
+    {% endif %}
+
+    {% if socials.facebook %}
+    <a class="vc-social"
+       href="{{ socials.facebook }}"
+       target="_blank"
+       rel="noopener noreferrer">
+      Facebook
+    </a>
+    {% endif %}
+
+    {% if socials.website %}
+    <a class="vc-social"
+       href="{{ socials.website }}"
+       target="_blank"
+       rel="noopener noreferrer">
+      Site web
+    </a>
+    {% endif %}
+
+    {% if socials.whatsapp %}
+    <a class="vc-social"
+       href="https://wa.me/{{ socials.whatsapp|replace(' ','')|replace('+','') }}"
+       target="_blank"
+       rel="noopener noreferrer">
+      WhatsApp
+    </a>
+    {% endif %}
+
+  </div>
+
+  {% endif %}
+
+  {% if card.qr_path %}
+
+  <p class="vc-section-title">
+    Partager
+  </p>
+
+  <div class="vc-qr-wrap">
+
+    <div class="vc-qr-frame">
+
+      <div class="nx-qr-wrap">
+
+        <img
+          src="{{ url_for('static', filename=card.qr_path) }}"
+          alt="QR code">
+
+        <div class="nx-qr-line"></div>
+
+        <div class="nx-qr-corner nx-qr-corner-tl"></div>
+        <div class="nx-qr-corner nx-qr-corner-tr"></div>
+        <div class="nx-qr-corner nx-qr-corner-bl"></div>
+        <div class="nx-qr-corner nx-qr-corner-br"></div>
+
+      </div>
+
+    </div>
+
+    <p class="vc-qr-label">
+      Scannez pour partager cette carte
+    </p>
+
+  </div>
+
+  {% endif %}
+
+  <a class="vc-save"
+     href="{{ url_for('vcard.vcard', slug=card.slug) }}">
+
+    <svg viewBox="0 0 24 24">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+      <polyline points="7 10 12 15 17 10"/>
+      <line x1="12" y1="15" x2="12" y2="3"/>
+    </svg>
+
+    Enregistrer le contact
+
+  </a>
+
+</div>
+
+<p class="vc-footer">
+  Créé avec <a href="/">Nixcard</a>
+</p>
+
+</div>
+
+</body>
+</html>

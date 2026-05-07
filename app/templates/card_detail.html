@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}{{ card.full_name }} — Nixcard{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h2>{{ card.full_name }}</h2>
+  <div>
+    <a class="btn" href="{{ url_for('dashboard.edit_card', card_id=card.id) }}">Modifier</a>
+    <form method="post" action="{{ url_for('dashboard.delete_card', card_id=card.id) }}" style="display:inline" onsubmit="return confirm('Supprimer cette carte ?')">
+      <button class="btn btn-danger" type="submit">Supprimer</button>
+    </form>
+  </div>
+</div>
+
+<div class="detail-grid">
+  <div class="card-panel">
+    <h3>Lien public</h3>
+    <p><a href="{{ public_url }}" target="_blank">{{ public_url }}</a></p>
+    <p class="muted">Cette URL — et le QR code — ne changent jamais, même après modification de la carte.</p>
+    {% if qr_rel %}
+    <img class="qr" src="{{ url_for('static', filename=qr_rel) }}" alt="QR code">
+    <p><a class="btn" href="{{ url_for('static', filename=qr_rel) }}" download>Télécharger le QR</a></p>
+    {% endif %}
+  </div>
+  <div class="card-panel">
+    <h3>Informations</h3>
+    <ul class="kv">
+      <li><span>Poste</span><b>{{ card.job_title or '—' }}</b></li>
+      <li><span>Entreprise</span><b>{{ card.company or '—' }}</b></li>
+      <li><span>Téléphone</span><b>{{ card.phone or '—' }}</b></li>
+      <li><span>Email</span><b>{{ card.email or '—' }}</b></li>
+    </ul>
+  </div>
+</div>
+{% endblock %}

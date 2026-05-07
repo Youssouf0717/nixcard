@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ 'Modifier' if card else 'Nouveau contact' }} — Nixcard</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,-apple-system,sans-serif;background:#0f172a;min-height:100vh;color:#e5e7eb;-webkit-font-smoothing:antialiased}
+
+/* ── Topbar ── */
+.topbar{
+  position:sticky;top:0;z-index:100;
+  background:rgba(15,23,42,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid #1f2937;
+  display:flex;align-items:center;justify-content:space-between;padding:14px 20px;
+}
+.topbar a,.topbar button{font-size:16px;font-weight:500;background:none;border:none;cursor:pointer;padding:4px 0;text-decoration:none;color:#ff8a33;font-family:inherit}
+.topbar-title{font-size:16px;font-weight:700;color:#e5e7eb}
+.topbar button.save{font-weight:700;color:#ff6a00}
+
+/* ── Layout deux colonnes ── */
+.layout{display:flex;gap:0;min-height:calc(100vh - 53px)}
+
+/* ── Colonne formulaire ── */
+.form-col{
+  flex:1;
+  overflow-y:auto;
+  padding-bottom:40px;
+  border-right:1px solid #1f2937;
+}
+
+/* ── Colonne preview ── */
+.preview-col{
+  width:380px;
+  flex-shrink:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:32px 20px;
+  position:sticky;
+  top:53px;
+  height:calc(100vh - 53px);
+  overflow-y:auto;
+}
+.preview-label{
+  font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;
+  color:#374151;margin-bottom:16px;
+}
+
+/* ── Mini card preview ── */
+.preview-card{
+  width:100%;max-width:320px;
+  background:#111827;border-radius:20px;
+  border:1px solid #1f2937;
+  box-shadow:0 20px 60px rgba(0,0,0,.5);
+  overflow:hidden;
+  transition:transform .2s ease;
+}
+.preview-card:hover{transform:scale(1.01)}
+
+.p-cover{
+  height:100px;
+  background:linear-gradient(135deg,#1a0a00 0%,#7c2d00 50%,#ff6a00 100%);
+  position:relative;
+}
+.p-cover-logo{
+  position:absolute;top:10px;left:50%;transform:translateX(-50%);
+  font-size:10px;font-weight:800;letter-spacing:2px;color:rgba(255,255,255,.6);text-transform:uppercase;
+}
+
+.p-avatar-wrap{display:flex;justify-content:center;position:relative;height:52px;margin-top:8px}
+.p-avatar{
+  width:80px;height:80px;border-radius:50%;
+  border:3px solid #111827;
+  box-shadow:0 0 0 2.5px #ff6a00;
+  object-fit:cover;
+  position:absolute;top:-40px;
+  background:linear-gradient(135deg,#7c2d00,#ff6a00);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.5rem;font-weight:800;color:#fff;
+  overflow:hidden;
+  transition:all .2s ease;
+}
+.p-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+
+.p-identity{text-align:center;padding:12px 16px 0;transition:all .15s}
+.p-name{font-size:1.1rem;font-weight:800;color:#e5e7eb;letter-spacing:-.2px;line-height:1.2;min-height:1.3em}
+.p-title{font-size:.8rem;color:#ff8a33;font-weight:600;margin-top:3px;min-height:1.1em}
+.p-company{font-size:.75rem;color:#9ca3af;margin-top:1px;min-height:1em}
+
+.p-divider{height:1px;background:#1f2937;margin:12px 16px 0}
+
+.p-actions{display:flex;justify-content:center;gap:8px;padding:12px 16px 0}
+.p-action{
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  text-decoration:none;flex:1;max-width:70px;
+  opacity:0;transform:translateY(4px);
+  transition:opacity .2s,transform .2s;
+}
+.p-action.visible{opacity:1;transform:translateY(0)}
+.p-action-icon{
+  width:40px;height:40px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;font-size:16px;
+  background:#1f2937;border:1px solid #374151;
+}
+.p-action span{font-size:.62rem;font-weight:600;color:#9ca3af}
+
+.p-section{font-size:.62rem;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#374151;padding:12px 16px 6px}
+
+.p-socials{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px}
+.p-social{
+  display:flex;align-items:center;gap:5px;
+  padding:5px 10px;border-radius:8px;
+  background:#1f2937;border:1px solid #374151;
+  font-size:.7rem;font-weight:600;color:#e5e7eb;
+  opacity:0;transform:scale(.9);
+  transition:opacity .2s,transform .2s;
+}
+.p-social.visible{opacity:1;transform:scale(1)}
+.p-social svg{width:12px;height:12px;flex-shrink:0}
+
+.p-save{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  margin:12px 16px;padding:10px;
+  background:linear-gradient(135deg,#ff6a00,#ff8a33);
+  color:#fff;border-radius:10px;font-size:.82rem;font-weight:700;
+  box-shadow:0 4px 14px rgba(255,106,0,.3);
+}
+
+/* ── Flashes ── */
+.flash-wrap{padding:0 16px;margin-top:12px}
+.flash{padding:10px 14px;border-radius:10px;font-size:14px;margin-bottom:8px}
+.flash-error  {background:rgba(239,68,68,.12);color:#fca5a5;border-left:3px solid #ef4444}
+.flash-success{background:rgba(255,106,0,.1);color:#fdba74;border-left:3px solid #ff6a00}
+
+/* ── Avatar upload ── */
+.avatar-section{display:flex;flex-direction:column;align-items:center;padding:24px 20px 12px;gap:8px}
+.avatar-ring{position:relative;width:88px;height:88px;cursor:pointer}
+.avatar-ring input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.avatar-sil{width:88px;height:88px;border-radius:50%;background:#1f2937;border:2.5px solid #374151;display:flex;align-items:center;justify-content:center}
+.avatar-sil svg{width:52px;height:52px;fill:#374151}
+.avatar-cur{width:88px;height:88px;border-radius:50%;overflow:hidden;border:2.5px solid #ff6a00;box-shadow:0 0 0 2px rgba(255,106,0,.2)}
+.avatar-cur img{width:100%;height:100%;object-fit:cover}
+.avatar-badge{position:absolute;bottom:1px;right:1px;width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#ff6a00,#ff8a33);border:2px solid #0f172a;display:flex;align-items:center;justify-content:center}
+.avatar-badge svg{width:12px;height:12px;fill:#fff}
+.avatar-label{font-size:13px;color:#ff8a33;font-weight:600}
+
+/* ── Form sections ── */
+.form-section{background:#111827;border-radius:12px;margin:0 16px 12px;border:1px solid #1f2937;overflow:hidden}
+.form-row{display:flex;align-items:center;padding:0 16px;min-height:50px;border-bottom:1px solid #1f2937;gap:12px}
+.form-row:last-child{border-bottom:none}
+.row-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.row-icon svg{width:15px;height:15px;fill:#fff}
+.i-orange{background:linear-gradient(135deg,#ff6a00,#ff8a33)}
+.i-blue{background:#1d4ed8}.i-pink{background:#be185d}.i-green{background:#15803d}.i-teal{background:#0e7490}
+.form-row input{flex:1;border:none;outline:none;font-size:15px;color:#e5e7eb;background:transparent;padding:11px 0;min-width:0;font-family:inherit}
+.form-row input::placeholder{color:#374151}
+
+.s-header{font-size:11px;font-weight:700;color:#4b5563;text-transform:uppercase;letter-spacing:.6px;padding:16px 32px 5px}
+
+/* ── Bouton save bas ── */
+.save-wrap{padding:8px 16px 48px}
+.save-btn{width:100%;padding:13px;background:linear-gradient(135deg,#ff6a00,#ff8a33);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 18px rgba(255,106,0,.35)}
+
+/* ── Mobile : preview en bas ── */
+@media(max-width:768px){
+  .layout{flex-direction:column}
+  .form-col{border-right:none;border-bottom:1px solid #1f2937}
+  .preview-col{width:100%;position:static;height:auto;padding:24px 16px 40px;border-top:1px solid #1f2937}
+  .preview-card{max-width:300px}
+}
+</style>
+</head>
+<body>
+
+<form method="POST"
+      action="{{ url_for('dashboard.edit_card', card_id=card.id) if card else url_for('dashboard.new_card') }}"
+      enctype="multipart/form-data"
+      id="card-form">
+
+<!-- Topbar -->
+<div class="topbar">
+  <a href="{{ url_for('dashboard.index') }}">Annuler</a>
+  <span class="topbar-title">{{ 'Modifier' if card else 'Nouveau contact' }}</span>
+  <button type="submit" class="save">Enregistrer</button>
+</div>
+
+<div class="layout">
+
+<!-- ════ COLONNE FORMULAIRE ════ -->
+<div class="form-col">
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-wrap">
+      {% for category, msg in messages %}
+        <div class="flash flash-{{ category }}">{{ msg }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  {% endwith %}
+
+  <!-- Avatar -->
+  <div class="avatar-section">
+    <div class="avatar-ring" id="avatar-ring">
+      {% if card and card.photo_url %}
+        <div class="avatar-cur" id="avatar-cur">
+          <img id="avatar-img" src="{{ url_for('static', filename=card.photo_url) }}" alt="">
+        </div>
+      {% else %}
+        <div class="avatar-sil" id="avatar-sil">
+          <svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+        </div>
+        <div class="avatar-cur" id="avatar-cur" style="display:none">
+          <img id="avatar-img" src="" alt="">
+        </div>
+      {% endif %}
+      <div class="avatar-badge">
+        <svg viewBox="0 0 24 24"><path d="M12 15.5A3.5 3.5 0 0 1 8.5 12 3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5 3.5 3.5 0 0 1-3.5 3.5zM9 3L7.17 5H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-3.17L15 3H9z"/></svg>
+      </div>
+      <input type="file" name="photo" accept="image/*" id="photo-input">
+    </div>
+    <span class="avatar-label">{{ 'Changer la photo' if card and card.photo_url else 'Ajouter une photo' }}</span>
+  </div>
+
+  <!-- Identité -->
+  <div class="form-section">
+    <div class="form-row"><input id="f_first" name="first_name" placeholder="Prénom *" required value="{{ card.first_name if card else '' }}"></div>
+    <div class="form-row"><input id="f_last"  name="last_name"  placeholder="Nom *"    required value="{{ card.last_name  if card else '' }}"></div>
+    <div class="form-row"><input id="f_co"    name="company"    placeholder="Entreprise" value="{{ card.company   or '' if card else '' }}"></div>
+    <div class="form-row"><input id="f_job"   name="job_title"  placeholder="Poste"      value="{{ card.job_title or '' if card else '' }}"></div>
+  </div>
+
+  <p class="s-header">Téléphone</p>
+  <div class="form-section">
+    <div class="form-row">
+      <div class="row-icon i-green"><svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div>
+      <input id="f_phone" name="phone" type="tel" placeholder="Téléphone *" required value="{{ card.phone or '' if card else '' }}">
+    </div>
+  </div>
+
+  <p class="s-header">Email</p>
+  <div class="form-section">
+    <div class="form-row">
+      <div class="row-icon i-blue"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/></svg></div>
+      <input id="f_email" name="email" type="email" placeholder="Email *" required value="{{ card.email or '' if card else '' }}">
+    </div>
+  </div>
+
+  {% set s = card.socials if card and card.socials else {} %}
+  <p class="s-header">Réseaux sociaux</p>
+  <div class="form-section">
+    <div class="form-row">
+      <div class="row-icon i-blue"><svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 1 1 0-4.124 2.062 2.062 0 0 1 0 4.124zM7.119 20.452H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></div>
+      <input id="f_linkedin"  name="social_linkedin"  placeholder="LinkedIn"  value="{{ s.get('linkedin','') }}">
+    </div>
+    <div class="form-row">
+      <div class="row-icon i-pink"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg></div>
+      <input id="f_instagram" name="social_instagram" placeholder="Instagram" value="{{ s.get('instagram','') }}">
+    </div>
+    <div class="form-row">
+      <div class="row-icon" style="background:#1877f2"><svg viewBox="0 0 24 24" fill="#fff"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></div>
+      <input id="f_facebook"  name="social_facebook"  placeholder="Facebook"  value="{{ s.get('facebook','') }}">
+    </div>
+    <div class="form-row">
+      <div class="row-icon i-teal"><svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+      <input id="f_website"   name="social_website"   placeholder="Site web"  value="{{ s.get('website','') }}">
+    </div>
+    <div class="form-row">
+      <div class="row-icon i-green"><svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741 1.046.945-3.658-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg></div>
+      <input id="f_whatsapp"  name="social_whatsapp"  type="tel" placeholder="WhatsApp" value="{{ s.get('whatsapp','') }}">
+    </div>
+  </div>
+  <p class="s-header">Design</p>
+
+<div class="form-section">
+
+  <div class="form-row">
+
+    <div class="row-icon i-orange">
+      🎨
+    </div>
+
+    <select
+      id="f_template"
+      name="template"
+      style="
+        flex:1;
+        background:transparent;
+        border:none;
+        color:#e5e7eb;
+        font-size:15px;
+        outline:none;
+        font-family:inherit;
+      "
+    >
+      <option value="business">Business</option>
+      <option value="minimal">Minimal</option>
+      <option value="luxury">Luxury</option>
+      <option value="creator">Creator</option>
+    </select>
+
+  </div>
+
+  <div class="form-row">
+
+    <div class="row-icon i-orange">
+      ✨
+    </div>
+
+    <input
+      type="color"
+      id="f_color"
+      value="#ff6a00"
+      style="
+        width:100%;
+        height:35px;
+        border:none;
+        background:none;
+      "
+    >
+
+  </div>
+
+</div>
+  <div class="save-wrap">
+    <button type="submit" class="save-btn">{{ 'Enregistrer les modifications' if card else 'Créer la carte' }}</button>
+  </div>
+
+</div><!-- /form-col -->
+
+<!-- ════ COLONNE PREVIEW ════ -->
+<div class="preview-col">
+  <p class="preview-label">Aperçu en direct</p>
+
+  <div class="preview-card">
+    <div class="p-cover"><div class="p-cover-logo">Nixcard</div></div>
+
+    <div class="p-avatar-wrap">
+      <div class="p-avatar" id="p-avatar">
+        <span id="p-initials">?</span>
+        <img id="p-photo" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:50%">
+      </div>
+    </div>
+
+    <div class="p-identity">
+      <div class="p-name"  id="p-name">Prénom Nom</div>
+      <div class="p-title" id="p-title"></div>
+      <div class="p-company" id="p-company"></div>
+    </div>
+
+  <div class="p-divider"></div>
+
+  <div style="display:flex;justify-content:center;padding:14px 16px 0">
+    <div style="background:#fff;border-radius:12px;padding:8px;display:inline-block;box-shadow:0 0 0 1px rgba(255,106,0,.2)">
+      <div class="nx-qr-wrap">
+        <img src="{{ url_for('static', filename='qr/demo.JPEG') }}" alt="QR" style="width:90px;height:90px;display:block;border-radius:6px">
+        <div class="nx-qr-line"></div>
+        <div class="nx-qr-corner nx-qr-corner-tl"></div>
+        <div class="nx-qr-corner nx-qr-corner-tr"></div>
+        <div class="nx-qr-corner nx-qr-corner-bl"></div>
+        <div class="nx-qr-corner nx-qr-corner-br"></div>
+      </div>
+    </div>
+  </div>
+
+    <div class="p-actions">
+      <div class="p-action" id="p-btn-phone">
+        <div class="p-action-icon">📞</div><span>Appeler</span>
+      </div>
+      <div class="p-action" id="p-btn-email">
+        <div class="p-action-icon">✉️</div><span>Email</span>
+      </div>
+      <div class="p-action" id="p-btn-wa">
+        <div class="p-action-icon">💬</div><span>WhatsApp</span>
+      </div>
+    </div>
+
+    <!-- Réseaux sociaux -->
+    <div id="p-socials-wrap" style="display:none">
+      <p class="p-section">Réseaux</p>
+      <div class="p-socials" id="p-socials"></div>
+    </div>
+
+    <div class="p-save">💾 Enregistrer le contact</div>
+  </div>
+</div><!-- /preview-col -->
+
+</div><!-- /layout -->
+</form>
+
+<script>
+// ── Références ──────────────────────────────────
+const fields = {
+  first:     document.getElementById('f_first'),
+  last:      document.getElementById('f_last'),
+  job:       document.getElementById('f_job'),
+  company:   document.getElementById('f_co'),
+  phone:     document.getElementById('f_phone'),
+  email:     document.getElementById('f_email'),
+  linkedin:  document.getElementById('f_linkedin'),
+  instagram: document.getElementById('f_instagram'),
+  facebook:  document.getElementById('f_facebook'),
+  website:   document.getElementById('f_website'),
+  whatsapp:  document.getElementById('f_whatsapp'),
+};
+const pName      = document.getElementById('p-name');
+const pTitle     = document.getElementById('p-title');
+const pCompany   = document.getElementById('p-company');
+const pInitials  = document.getElementById('p-initials');
+const pPhoto     = document.getElementById('p-photo');
+const pAvatar    = document.getElementById('p-avatar');
+const pBtnPhone  = document.getElementById('p-btn-phone');
+const pBtnEmail  = document.getElementById('p-btn-email');
+const pBtnWa     = document.getElementById('p-btn-wa');
+const pSocialsW  = document.getElementById('p-socials-wrap');
+const pSocials   = document.getElementById('p-socials');
+
+// ── Icônes SVG réseaux ───────────────────────────
+const socialIcons = {
+  linkedin:  `<svg viewBox="0 0 24 24" fill="#0a66c2" width="12" height="12"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 1 1 0-4.124 2.062 2.062 0 0 1 0 4.124zM7.119 20.452H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>`,
+  instagram: `<svg viewBox="0 0 24 24" width="12" height="12"><defs><linearGradient id="ig2" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#f09433"/><stop offset="50%" stop-color="#dc2743"/><stop offset="100%" stop-color="#bc1888"/></linearGradient></defs><path fill="url(#ig2)" d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>`,
+  facebook:  `<svg viewBox="0 0 24 24" fill="#1877f2" width="12" height="12"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>`,
+  website:   `<svg viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`,
+  whatsapp:  `<svg viewBox="0 0 24 24" fill="#25d366" width="12" height="12"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741 1.046.945-3.658-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>`,
+};
+const socialLabels = {linkedin:'LinkedIn',instagram:'Instagram',facebook:'Facebook',website:'Site web',whatsapp:'WhatsApp'};
+
+// ── Mise à jour preview ──────────────────────────
+function update() {
+  const first = fields.first.value.trim();
+  const last  = fields.last.value.trim();
+  const job   = fields.job.value.trim();
+  const co    = fields.company.value.trim();
+  const phone = fields.phone.value.trim();
+  const email = fields.email.value.trim();
+
+  // Nom
+  const fullName = [first, last].filter(Boolean).join(' ');
+  pName.textContent = fullName || 'Prénom Nom';
+
+  // Initiales
+  const initials = [(first||'?')[0], (last||'')[0]].filter(Boolean).join('').toUpperCase();
+  pInitials.textContent = initials || '?';
+
+  // Titre / entreprise
+  pTitle.textContent   = job;
+  pCompany.textContent = co;
+
+  // Boutons action
+  toggle(pBtnPhone, !!phone);
+  toggle(pBtnEmail, !!email);
+  toggle(pBtnWa,    !!phone);
+
+  // Réseaux sociaux
+  const nets = ['linkedin','instagram','facebook','website','whatsapp'];
+  const active = nets.filter(k => fields[k] && fields[k].value.trim());
+  pSocialsW.style.display = active.length ? '' : 'none';
+  pSocials.innerHTML = active.map(k =>
+    `<div class="p-social visible">${socialIcons[k]}<span>${socialLabels[k]}</span></div>`
+  ).join('');
+}
+
+function toggle(el, show) {
+  if(show) el.classList.add('visible');
+  else     el.classList.remove('visible');
+}
+
+// ── Photo ────────────────────────────────────────
+document.getElementById('photo-input').addEventListener('change', function() {
+  const file = this.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    // Formulaire
+    const sil = document.getElementById('avatar-sil');
+    const cur = document.getElementById('avatar-cur');
+    const img = document.getElementById('avatar-img');
+    if(sil) sil.style.display = 'none';
+    if(cur) { cur.style.display = ''; img.src = e.target.result; }
+
+    // Preview
+    pPhoto.src = e.target.result;
+    pPhoto.style.display = 'block';
+    pInitials.style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+});
+
+// ── Écoute tous les inputs ───────────────────────
+Object.values(fields).forEach(el => {
+  if(el) el.addEventListener('input', update);
+});
+
+// ── Init ─────────────────────────────────────────
+update();
+
+{% if card and card.photo_url %}
+pPhoto.src = "{{ url_for('static', filename=card.photo_url) }}";
+pPhoto.style.display = 'block';
+pInitials.style.display = 'none';
+{% endif %}
+
+// ── Loading on submit ────────────────────────
+document.getElementById('card-form').addEventListener('submit', function() {
+  this.querySelectorAll('button[type="submit"]').forEach(btn => {
+    btn.disabled = true;
+    btn.innerHTML = '<span class="nx-dots"><span></span><span></span><span></span></span>&ensp;Enregistrement…';
+    btn.style.opacity = '.75';
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Tableau de bord — Nixcard{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h2>Mes cartes</h2>
+  <a class="btn btn-primary" href="{{ url_for('dashboard.new_card') }}">+ Nouvelle carte</a>
+</div>
+
+{% if cards %}
+<div class="grid">
+  {% for c in cards %}
+  <a class="card-tile" href="{{ url_for('dashboard.card_detail', card_id=c.id) }}">
+    <div class="avatar">
+      {% if c.photo_url %}
+        <img src="{{ url_for('static', filename=c.photo_url) }}" alt="{{ c.full_name }}">
+      {% else %}
+        {{ c.first_name[0] }}{{ c.last_name[0] }}
+      {% endif %}
+    </div>
+    <div>
+      <strong>{{ c.full_name }}</strong>
+      <div class="muted" style="font-size:.85rem;margin-top:2px">
+        {{ c.job_title or '' }}{% if c.job_title and c.company %} · {% endif %}{{ c.company or '' }}
+      </div>
+      <div class="slug">/card/{{ c.slug }}</div>
+    </div>
+  </a>
+  {% endfor %}
+</div>
+
+{% else %}
+<div class="empty">
+  <p>Aucune carte pour le moment.</p>
+  <a class="btn btn-primary btn-lg" href="{{ url_for('dashboard.new_card') }}">Créer ma première carte</a>
+</div>
+{% endif %}
+{% endblock %}
