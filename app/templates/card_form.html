@@ -181,6 +181,7 @@ body{font-family:Inter,-apple-system,sans-serif;background:#0f172a;min-height:10
       action="{{ url_for('dashboard.edit_card', card_id=card.id) if card else url_for('dashboard.new_card') }}"
       enctype="multipart/form-data"
       id="card-form">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
 <!-- Topbar -->
 <div class="topbar">

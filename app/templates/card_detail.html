@@ -6,6 +6,7 @@
   <div>
     <a class="btn" href="{{ url_for('dashboard.edit_card', card_id=card.id) }}">Modifier</a>
     <form method="post" action="{{ url_for('dashboard.delete_card', card_id=card.id) }}" style="display:inline" onsubmit="return confirm('Supprimer cette carte ?')">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       <button class="btn btn-danger" type="submit">Supprimer</button>
     </form>
   </div>

@@ -1,13 +1,23 @@
 {% extends "base.html" %}
 {% block title %}Connexion — Nixcard{% endblock %}
 {% block content %}
-<div class="card-panel">
-  <h2>Connexion</h2>
+<div class="card-panel" style="max-width:400px;margin:40px auto">
+  <h2 style="margin-bottom:20px">Connexion</h2>
   <form method="post">
-    <label>Email<input type="email" name="email" required></label>
-    <label>Mot de passe<input type="password" name="password" required></label>
-    <button class="btn btn-primary" type="submit">Se connecter</button>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="next" value="{{ next }}">
+    <label>Email
+      <input type="email" name="email" autocomplete="email" required autofocus>
+    </label>
+    <label>Mot de passe
+      <input type="password" name="password" autocomplete="current-password" required>
+    </label>
+    <div style="margin-top:8px">
+      <button class="btn btn-primary" style="width:100%" type="submit">Se connecter</button>
+    </div>
   </form>
-  <p class="muted">Pas encore de compte ? <a href="{{ url_for('auth.register') }}">S'inscrire</a></p>
+  <p class="muted" style="margin-top:16px;text-align:center">
+    Pas encore de compte ? <a href="{{ url_for('auth.register') }}">S'inscrire</a>
+  </p>
 </div>
 {% endblock %}

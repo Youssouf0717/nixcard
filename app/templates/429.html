@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Trop de requêtes — Nixcard{% endblock %}
+{% block content %}
+<div class="card-panel" style="text-align:center;padding:48px 24px">
+  <p style="font-size:3rem;margin-bottom:16px">🔒</p>
+  <h2 style="margin-bottom:12px">Trop de tentatives</h2>
+  <p class="muted" style="margin-bottom:24px">Vous avez effectué trop de requêtes. Veuillez patienter une minute avant de réessayer.</p>
+  <a class="btn btn-primary" href="{{ url_for('auth.login') }}">Retour à la connexion</a>
+</div>
+{% endblock %}
