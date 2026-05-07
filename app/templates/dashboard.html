@@ -12,7 +12,7 @@
   <a class="card-tile" href="{{ url_for('dashboard.card_detail', card_id=c.id) }}">
     <div class="avatar">
       {% if c.photo_url %}
-        <img src="{{ url_for('static', filename=c.photo_url) }}" alt="{{ c.full_name }}">
+        <img src="{{ c.photo_url if c.photo_url.startswith('http') else url_for('static', filename=c.photo_url) }}" alt="{{ c.full_name }}">
       {% else %}
         {{ c.first_name[0] }}{{ c.last_name[0] }}
       {% endif %}

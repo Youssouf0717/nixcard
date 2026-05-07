@@ -721,7 +721,7 @@ body{
     {% if card.photo_url %}
       <img
         class="vc-avatar"
-        src="{{ url_for('static', filename=card.photo_url) }}"
+        src="{{ card.photo_url if card.photo_url.startswith('http') else url_for('static', filename=card.photo_url) }}"
         alt="{{ card.full_name }}">
     {% else %}
       <div class="vc-initials">
@@ -865,7 +865,7 @@ body{
       <div class="nx-qr-wrap">
 
         <img
-          src="{{ url_for('static', filename=card.qr_path) }}"
+          src="{{ card.qr_path if card.qr_path.startswith('http') else url_for('static', filename=card.qr_path) }}"
           alt="QR code">
 
         <div class="nx-qr-line"></div>

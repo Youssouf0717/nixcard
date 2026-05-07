@@ -1,5 +1,7 @@
 import os
 import uuid
+import cloudinary
+import cloudinary.uploader
 from app import db
 from app.models.card import Card
 from app.utils.slug import make_unique_slug
@@ -14,6 +16,19 @@ SOCIAL_KEYS = ["whatsapp", "facebook", "instagram", "linkedin", "website"]
 URL_SOCIAL_KEYS = {"facebook", "instagram", "linkedin", "website"}
 
 
+def _cloudinary_configured() -> bool:
+    return bool(os.getenv("CLOUDINARY_CLOUD_NAME"))
+
+
+def _setup_cloudinary():
+    cloudinary.config(
+        cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
+        api_key=os.getenv("CLOUDINARY_API_KEY"),
+        api_secret=os.getenv("CLOUDINARY_API_SECRET"),
+        secure=True,
+    )
+
+
 def _save_photo(files) -> str | None:
     if not files:
         return None
@@ -23,6 +38,19 @@ def _save_photo(files) -> str | None:
     ext = f.filename.rsplit(".", 1)[-1].lower()
     if ext not in ALLOWED_EXTENSIONS:
         return None
+
+    if _cloudinary_configured():
+        _setup_cloudinary()
+        result = cloudinary.uploader.upload(
+            f,
+            folder="nixcard/uploads",
+            public_id=uuid.uuid4().hex,
+            resource_type="image",
+            transformation=[{"width": 400, "height": 400, "crop": "fill", "gravity": "face"}],
+        )
+        return result["secure_url"]
+
+    # Fallback local
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
     filename = f"{uuid.uuid4().hex}.{ext}"
     f.save(os.path.join(UPLOAD_FOLDER, filename))

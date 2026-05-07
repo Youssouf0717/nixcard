@@ -210,7 +210,7 @@ body{font-family:Inter,-apple-system,sans-serif;background:#0f172a;min-height:10
     <div class="avatar-ring" id="avatar-ring">
       {% if card and card.photo_url %}
         <div class="avatar-cur" id="avatar-cur">
-          <img id="avatar-img" src="{{ url_for('static', filename=card.photo_url) }}" alt="">
+          <img id="avatar-img" src="{{ card.photo_url if card.photo_url.startswith('http') else url_for('static', filename=card.photo_url) }}" alt="">
         </div>
       {% else %}
         <div class="avatar-sil" id="avatar-sil">
@@ -504,7 +504,7 @@ Object.values(fields).forEach(el => {
 update();
 
 {% if card and card.photo_url %}
-pPhoto.src = "{{ url_for('static', filename=card.photo_url) }}";
+pPhoto.src = "{{ card.photo_url if card.photo_url.startswith('http') else url_for('static', filename=card.photo_url) }}";
 pPhoto.style.display = 'block';
 pInitials.style.display = 'none';
 {% endif %}
