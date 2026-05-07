@@ -65,6 +65,7 @@ body{font-family:Inter,-apple-system,sans-serif;background:#0f172a;min-height:10
   height:100px;
   background:linear-gradient(135deg,#1a0a00 0%,#7c2d00 50%,#ff6a00 100%);
   position:relative;
+  transition:background .3s;
 }
 .p-cover-logo{
   position:absolute;top:10px;left:50%;transform:translateX(-50%);
@@ -297,10 +298,11 @@ body{font-family:Inter,-apple-system,sans-serif;background:#0f172a;min-height:10
         font-family:inherit;
       "
     >
-      <option value="business">Business</option>
-      <option value="minimal">Minimal</option>
-      <option value="luxury">Luxury</option>
-      <option value="creator">Creator</option>
+      {% set tpl = card.template if card else 'business' %}
+      <option value="business" {{ 'selected' if tpl == 'business' }}>Business</option>
+      <option value="minimal"  {{ 'selected' if tpl == 'minimal'  }}>Minimal</option>
+      <option value="luxury"   {{ 'selected' if tpl == 'luxury'   }}>Luxury</option>
+      <option value="creator"  {{ 'selected' if tpl == 'creator'  }}>Creator</option>
     </select>
 
   </div>
@@ -314,12 +316,14 @@ body{font-family:Inter,-apple-system,sans-serif;background:#0f172a;min-height:10
     <input
       type="color"
       id="f_color"
-      value="#ff6a00"
+      name="accent_color"
+      value="{{ card.accent_color if card else '#ff6a00' }}"
       style="
         width:100%;
         height:35px;
         border:none;
         background:none;
+        cursor:pointer;
       "
     >
 
@@ -503,6 +507,29 @@ pPhoto.src = "{{ url_for('static', filename=card.photo_url) }}";
 pPhoto.style.display = 'block';
 pInitials.style.display = 'none';
 {% endif %}
+
+// ── Thème / couleur preview ──────────────────
+const COVERS = {
+  business: 'linear-gradient(135deg,#1a0a00 0%,#7c2d00 50%,#ff6a00 100%)',
+  minimal:  'linear-gradient(135deg,#0f172a 0%,#1e293b 60%,#334155 100%)',
+  luxury:   'linear-gradient(135deg,#0d0800 0%,#3d2b00 50%,#c9a227 100%)',
+  creator:  'linear-gradient(135deg,#1a0a2e 0%,#4c1d95 50%,#7c3aed 100%)',
+};
+const pCover  = document.querySelector('.p-cover');
+const pAvatar = document.getElementById('p-avatar');
+const pSaveEl = document.querySelector('.p-save');
+
+function applyTheme() {
+  const tpl   = document.getElementById('f_template').value;
+  const color = document.getElementById('f_color').value;
+  pCover.style.background = COVERS[tpl] || COVERS.business;
+  pAvatar.style.boxShadow = `0 0 0 2.5px ${color}`;
+  if(pSaveEl) pSaveEl.style.background = color;
+}
+
+document.getElementById('f_template').addEventListener('change', applyTheme);
+document.getElementById('f_color').addEventListener('input', applyTheme);
+applyTheme();
 
 // ── Loading on submit ────────────────────────
 document.getElementById('card-form').addEventListener('submit', function() {

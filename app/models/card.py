@@ -18,6 +18,8 @@ class Card(db.Model):
     socials = db.Column(JSON, default={})
     views = db.Column(db.Integer, default=0)
     qr_path = db.Column(db.String(200))
+    template = db.Column(db.String(50), default='business')
+    accent_color = db.Column(db.String(20), default='#ff6a00')
 
     @property
     def full_name(self) -> str:

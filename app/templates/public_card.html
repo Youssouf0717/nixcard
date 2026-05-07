@@ -8,6 +8,19 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
 
 <style>
+{% set accent = card.accent_color or '#ff6a00' %}
+{% if card.template == 'minimal' %}
+  :root { --t-cover: linear-gradient(135deg,#0f172a 0%,#1e293b 60%,#334155 100%); --t-accent: {{ accent }}; }
+{% elif card.template == 'luxury' %}
+  :root { --t-cover: linear-gradient(135deg,#0d0800 0%,#3d2b00 50%,#c9a227 100%); --t-accent: {{ accent }}; }
+{% elif card.template == 'creator' %}
+  :root { --t-cover: linear-gradient(135deg,#1a0a2e 0%,#4c1d95 50%,#7c3aed 100%); --t-accent: {{ accent }}; }
+{% else %}
+  :root { --t-cover: linear-gradient(135deg,#1a0a00 0%,#7c2d00 50%,#ff6a00 100%); --t-accent: {{ accent }}; }
+{% endif %}
+</style>
+
+<style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 *,*::before,*::after{
@@ -45,13 +58,7 @@ body{
   width:100%;
   height:210px;
 
-  background:
-    linear-gradient(
-      135deg,
-      #1a0a00 0%,
-      #7c2d00 50%,
-      #ff6a00 100%
-    );
+  background: var(--t-cover);
 
   position:relative;
   overflow:hidden;
@@ -221,7 +228,7 @@ body{
   border:4px solid #111827;
 
   box-shadow:
-    0 0 0 3px #ff6a00,
+    0 0 0 3px var(--t-accent),
     0 8px 24px rgba(0,0,0,.5);
 
   animation:
@@ -233,12 +240,7 @@ body{
 }
 
 .vc-initials{
-  background:
-    linear-gradient(
-      135deg,
-      #7c2d00,
-      #ff6a00
-    );
+  background: var(--t-cover);
 
   display:flex;
   align-items:center;
@@ -272,7 +274,7 @@ body{
 .vc-title{
   margin-top:4px;
 
-  color:#ff8a33;
+  color:var(--t-accent);
 
   font-size:.95rem;
   font-weight:600;
@@ -352,10 +354,10 @@ body{
 .vc-action:hover .vc-action-icon{
   transform:translateY(-3px) scale(1.05);
 
-  border-color:#ff6a00;
+  border-color:var(--t-accent);
 
   box-shadow:
-    0 6px 18px rgba(255,106,0,.25);
+    0 6px 18px rgba(0,0,0,.25);
 }
 
 .vc-action span{
@@ -427,7 +429,7 @@ body{
 
   background:#374151;
 
-  border-color:#ff6a00;
+  border-color:var(--t-accent);
 
   color:#fff;
 }
@@ -463,7 +465,7 @@ body{
   padding:10px;
 
   box-shadow:
-    0 0 0 1px rgba(255,106,0,.2);
+    0 0 0 1px color-mix(in srgb, var(--t-accent) 40%, transparent);
 
   transition:
     transform .2s ease,
@@ -508,12 +510,7 @@ body{
 
   border-radius:14px;
 
-  background:
-    linear-gradient(
-      135deg,
-      #ff6a00,
-      #ff8a33
-    );
+  background: var(--t-accent);
 
   color:#fff;
 
@@ -537,7 +534,7 @@ body{
     fadeInUp .4s .6s ease both;
 
   box-shadow:
-    0 4px 20px rgba(255,106,0,.35);
+    0 4px 20px rgba(0,0,0,.35);
 }
 
 .vc-save::before{

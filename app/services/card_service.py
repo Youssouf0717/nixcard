@@ -53,6 +53,8 @@ def _extract_required(form) -> dict:
     }
 
 
+VALID_TEMPLATES = {"business", "minimal", "luxury", "creator"}
+
 def _apply_optional(card: Card, form, files=None) -> None:
     card.job_title = (form.get("job_title") or "").strip() or None
     card.company = (form.get("company") or "").strip() or None
@@ -60,6 +62,11 @@ def _apply_optional(card: Card, form, files=None) -> None:
     photo = _save_photo(files)
     if photo:
         card.photo_url = photo
+    tpl = (form.get("template") or "business").strip()
+    card.template = tpl if tpl in VALID_TEMPLATES else "business"
+    import re
+    color = (form.get("accent_color") or "#ff6a00").strip()
+    card.accent_color = color if re.match(r'^#[0-9a-fA-F]{6}$', color) else "#ff6a00"
 
 
 def create_card(user_id: int, form, files=None) -> Card:
